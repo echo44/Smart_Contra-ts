@@ -6,7 +6,7 @@ contract Agent {
     address store; // адрес Store
     
     function Agent() public {
-        owner = msg.sender; // запоминаем создателя контракти
+        owner = msg.sender; // запоминаем создателя контракта
     }
     
     function setAddress(address a) public { // указываем адрес получателя
@@ -39,12 +39,15 @@ contract Agent {
 }
 
 contract Storage  {
-    
+    address owner;
+    uint a = 0; // переменная счетчик, запоминает контракт-вкладчик
     
     function Storage() payable public{
         
     }
     function store() payable public { // принимает средства
+        if (a == 0) owner = msg.sender; // если а = 0 то запомним адрес контракта
+        a++; // если кто то другой положит сюда деньги мы не запомним его адрес
     }
     
     function getBalance() public view returns (uint256) { // показывает баланс
@@ -52,6 +55,9 @@ contract Storage  {
     } 
     
     function sendCoin() payable public { // отправляет средсва на Agent
+        require(owner == msg.sender);
         Agent(msg.sender).getBack.value(this.balance)();
+        a = 0; // все деньги вывели, "стираем память", готовы запомнить нового 
+               // вкладчика Agent
     }
 }
